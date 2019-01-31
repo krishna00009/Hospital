@@ -1,0 +1,609 @@
+<style>
+    .modal-content{
+        width:696px;
+    }
+
+    .modal-footer {
+        padding: 5px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+    .modal-header {
+        padding: 5px;
+        border-bottom: 1px solid #e5e5e5;
+    }
+    fieldset {
+        min-width: 0;
+        padding: 10px;
+        margin: 0;
+        border: 0;
+    }
+    .control-label {
+        position: relative;
+        min-height: 1px;
+        padding-right: 8px;
+        padding-left: 11px;
+    }
+
+    .form-control {
+        display: block;
+        width: 264px;
+        height: 34px;
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        color: #555;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+        -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+        -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    }
+</style>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+<div class="container-fluid">
+    <div class="container cus_main_row">
+        <div class="row">
+            <h2 class="pos-header-new">
+                <div>Current User</div>
+            </h2>
+        </div>
+        <div class="row inner_row_bg">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+
+                <div class="panel">
+                    <div class="panel-body">
+                        <div class="panel-body" style="height: 65px;">
+                            <div class="col-md-4 col-lg-3 col-sm-5 col-xs-5">
+                                <form class="form-horizontal ng-pristine ng-valid">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <p class="input-group" style="display: block;">
+                                                <input id="search_grade" name="textinput"  type="text" autocomplete="off"
+                                                       placeholder="search" ng-model="searchText" class="form-control input-md"
+                                                       ng-keyup="$event.keyCode == 13 ? getPaginatedUsersList(searchText) : null"/>
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+
+                            <div class="form-group">
+                                <div class="col-sm-2" >
+                                    <button type="button" class="btn btn-primary hi_btn"  ng-click="adduser()">Add</button>
+
+                                </div>
+                                <div class="col-sm-1">
+                                    <button type="button" class="btn btn-primary hi_btn"  ng-click="backUsers()">Back</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="fixed-table-container">
+                        <div class="table_wrapfixed-table-container-inner">
+                            <div class="header-background"></div>
+                            <table data-toggle="table" data-cache="false" data-height="299" class="hi_table table table-hover table-bordered table-striped table-fixed-header">
+                                <thead>
+                                <tr>
+                                    <th data-field="cntryname">
+                                        <div class="th-inner" align="center">First Name</div>
+                                    </th>
+                                    <th data-field="cntryname">
+                                        <div class="th-inner" align="center">Last Name</div>
+                                    </th>
+                                    <th data-field="edit">
+                                        <div class="th-inner" align="center">Password</div>
+                                    </th>
+                                    <th data-field="edit">
+                                        <div class="th-inner" align="center">Edit</div>
+                                    </th>
+                                    <th data-field="edit">
+                                        <div class="th-inner" align="center">Delete</div>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody id="parentTable">
+                                <input type="hidden" ng-model="id" value="{{id}}"/>
+                                <tr ng-repeat="user in userList|filter:searchText">
+                                    <td>{{user.firstName}}</td>
+                                    <td>{{user.lastName}}</td>
+                                    <td>{{user.password}}</td>
+                                    <td><button type="button" class="btn btn-primary hi_btn"  ng-click="EditUser(user)">Edit</button></td>
+                                    <td ng-hide="user.firstName=='admin'"><button type="button" class="btn btn-primary hi_btn"  ng-click="DeleteUser(user)">Delete</button></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div ng-if="searchText!='' && (userList).length==0">
+                                <div id="notFoundDiv" style="color:red; font-weight: bold">No Records Found</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-12 pagination_">
+                    <button type="button" class="btn btn-default hi_btn" ng-class="{'diabled-class': first}" ng-disabled="first"
+                            ng-click="getPaginatedUsersList('firstPage')"  ng-model="first">First
+                    </button>
+                    <button type="button" class="btn btn-default hi_btn"  ng-class="{'diabled-class': prev}" ng-disabled="prev"
+                            ng-click="getPaginatedUsersList('prevPage')"   ng-model="prev">Prev
+                    </button>
+                    <button type="button" class="btn btn-default hi_btn"  name="next" ng-disabled="next"
+                            ng-click="getPaginatedUsersList('nextPage')"  value="next"  ng-class="{'diabled-class': next}" ng-model="next">Next
+                    </button>
+                    <button type="button" class="btn btn-default hi_btn"
+                            ng-click="getPaginatedUsersList('lastPage')"   ng-class="{'diabled-class': last}" ng-disabled="last"
+                            ng-model="last">Last
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade Student" tabindex="-1" id="add_user" role="dialog" data-backdrop="static"
+             aria-labelledby="mySmallModalLabel">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content checkout" width="696px">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                aria-hidden="true">&times;</span></button>
+                        <h4 id = "user-title" class="modal-title">Add User</h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12">
+                                <form class="form-horizontal" name="student">
+                                    <fieldset>
+                                        <div class="tab-content">
+                                            <div class="tab-pane fade in active" id="sub_step12">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label" for=""> First Name<span style="color:red;">*</span></label>
+                                                        <div class="col-md-6" style="position:relative;">
+                                                            <input id="firstName" name="firstName"  maxlength="32"
+                                                                   type="text" placeholder="First Name"
+                                                                   ng-model="firstname"  alpha-with-space
+                                                                   class="form-control input-md" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label" for=""> Last Name </label>
+                                                        <div class="col-md-6" style="position:relative;">
+                                                            <input id="lastName" name="lastName"  maxlength="150"
+                                                                   type="text" placeholder="Last Name" ng-required="false"
+                                                                   ng-model="lastname"  alpha-with-space
+                                                                   class="form-control input-md" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label" for=""> Email </label>
+                                                        <div class="col-md-6" style="position:relative;">
+                                                            <input id="companyEmail" name="companyEmail"  maxlength="45"
+                                                                   ng-pattern="word"
+                                                                   type="text" placeholder=" Email"
+                                                                   ng-model="email"
+                                                                   class="form-control input-md" required>
+                                                            <p class="error" ng-show="school.emailId.$error.pattern">Enter Valid EmailId</p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label" for="">Phone Number
+                                                        </label>
+                                                        <div class="col-md-6">
+                                                            <strong>
+                                                                <input id="phoneNumber" name="phoneNumber"
+                                                                       limit-to="16" ng-required="false"
+                                                                       type="text" num-with-out-space
+                                                                       ng-model="phoneNumber"
+                                                                       class="form-control input-md" required>
+                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label" for="">Mobile Number
+                                                        </label>
+                                                        <div class="col-md-6">
+                                                            <strong>
+                                                                <input id="mobileNumber" name="mobileNumber"
+                                                                       limit-to="16"
+                                                                       type="text" num-with-out-space
+                                                                       ng-model="mobileNumber"
+                                                                       class="form-control input-md" >
+                                                            </strong>
+                                                        </div>
+                                                    </div>
+
+
+
+
+                                                    <!--<div class="form-group">-->
+                                                        <!--<label class="col-md-4 control-label" for="">Country </label>-->
+                                                        <!--<div class="col-md-6 col-sm-6" style="position:relative;">-->
+                                                            <!--<select id="countryId" name="countryId"-->
+                                                                    <!--ng-model="country" ng-change="countryState(country)"-->
+                                                                    <!--ng-options="country.countryName as country.countryName for country in countryList"-->
+                                                                    <!--class="form-control input-md">-->
+                                                                <!--<option value="">Select</option>-->
+                                                            <!--</select>-->
+                                                        <!--</div>-->
+                                                    <!--</div>-->
+                                                    <!--<div class="form-group">-->
+                                                        <!--<label class="col-md-4 control-label" for="">State </label>-->
+                                                        <!--<div class="col-md-6 col-sm-6" style="position:relative;">-->
+                                                            <!--<select id="stateId" name="stateId" ng-model="stateName" ng-change="stateCity(stateName)"-->
+                                                                    <!--ng-options="state.stateName as-->
+											<!--state.stateName for state in stateList" class="form-control input-md">-->
+                                                                <!--<option value="">Select</option>-->
+                                                            <!--</select>-->
+                                                        <!--</div>-->
+                                                    <!--</div>-->
+
+                                                    <!--<div class="form-group">-->
+                                                        <!--<label class="col-md-4 control-label" for="">City </label>-->
+                                                        <!--<div class="col-md-6 col-sm-6" style="position:relative;">-->
+                                                            <!--<select id="cityId" name="cityId" ng-model="city"-->
+                                                                    <!--ng-options="city.cityName as-->
+											<!--city.cityName for city in cityList" class="form-control input-md">-->
+                                                                <!--<option value="">Select</option>-->
+                                                            <!--</select>-->
+                                                        <!--</div>-->
+                                                    <!--</div>-->
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label" for=""> Zip Code</label>
+                                                        <div class="col-md-6" style="position:relative;">
+                                                            <input id="pinCode" name="pinCode" limit-to="6"
+                                                                   type="text" number ng-required="false"
+                                                                   ng-model="zipCode" num-with-out-space
+                                                                   class="form-control input-md" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label" for=""> User Name<span style="color:red;">*</span></label>
+                                                        <div class="col-md-6" style="position:relative;">
+                                                            <input id="userName" name="userName"  maxlength="32"
+                                                                   type="text" placeholder="User Name"
+                                                                   ng-model="username" alphanum-with-space
+                                                                   class="form-control input-md" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label" for=""> Password<span style="color:red;">*</span></label>
+                                                        <div class="col-md-6" style="position:relative;">
+                                                            <input id="password" name="password"  maxlength="32"
+                                                                   type="text" placeholder="Password"
+                                                                   ng-model="password"
+                                                                   class="form-control input-md" required>
+                                                        </div>
+                                                    </div>
+                                                    <!--<div class="form-group">-->
+                                                        <!--<label class="col-md-4 control-label" for=""> Retype Password<span style="color:red;">*</span></label>-->
+                                                        <!--<div class="col-md-6" style="position:relative;">-->
+                                                            <!--<input id="retypePassword" name="retypePassword"  maxlength="32"-->
+                                                                   <!--type="text" placeholder="Retype Password"-->
+                                                                   <!--ng-model="retypepassword"-->
+                                                                   <!--class="form-control input-md" required>-->
+                                                        <!--</div>-->
+                                                    <!--</div>-->
+                                                    <!--<div class="form-group">-->
+                                                    <!--<label class="col-md-4 control-label" for="">Calender</label>-->
+                                                    <!--<div class="col-md-6" style="position:relative;">-->
+                                                    <!--<select class="form-control input-md"-->
+                                                    <!--ng-model="calenderType" id="Calender">-->
+                                                    <!--<option value="">Select Type</option>-->
+                                                    <!--<option value="Default">Default</option>-->
+                                                    <!--<option value="Table">Table</option>-->
+                                                    <!--</select>-->
+
+                                                    <!--</div>-->
+                                                    <!--</div>-->
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label" for="">
+                                                            Address</label>
+                                                        <div class="col-md-6">
+                                                            <strong>
+                                                                        <textarea id="address"
+                                                                                  name="address" ng-required="false"
+                                                                                  maxlength="150"
+                                                                                  type="text"
+                                                                                  ng-model="address"
+                                                                                  class="form-control input-md"
+                                                                                  required>
+                                                            </textarea>
+                                                            </strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-4 control-label" for="">
+                                                            Notes</label>
+                                                        <div class="col-md-6">
+                                                            <strong>
+                                                                        <textarea id="notes"
+                                                                                  name="notes" ng-required="false"
+                                                                                  maxlength="150"
+                                                                                  type="text"
+                                                                                  ng-model="notes"
+                                                                                  class="form-control input-md"
+                                                                                  required>
+                                                            </textarea>
+                                                            </strong>
+                                                </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label class="col-md-6 col-sm-6 control-label" for="">Role</label>
+                                                        <div class="col-md-6" style="position:relative;">
+                                                            <select id="role" name="role" ng-model="role"
+                                                                    ng-options="role.name as
+											role.name for role in roleslist" class="form-control input-md">
+                                                                <option value="">Select</option>
+                                                            </select>                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </fieldset>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary hi_btn" id="submit" data-toggle="modal"
+                                data-target=".print-me" ng-click="saveCurrentUserDetails()">Save
+                        </button>
+                        <button type="button" class="btn btn-primary" ng-click="removeMedicine()" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+
+<!--<div class="modal-header">-->
+    <!--<h3 id = "student-title" class="modal-title">Current User </h3><br><br>-->
+    <!--<div class="panel-body">-->
+        <!--<div class="row">-->
+            <!--<div class="col-md-10 col-sm-10">-->
+                <!--<form class="form-horizontal" name="school">-->
+
+                    <!--<fieldset>-->
+                        <!--<div class="tab-content">-->
+                            <!--<div class="col-md-6">-->
+                                <!--<input type="hidden" id="Id" ng-model="id">-->
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for=""> First Name<span style="color:red;">*</span></label>-->
+                                    <!--<div class="col-md-6" style="position:relative;">-->
+                                        <!--<input id="firstName" name="firstName"  maxlength="32"-->
+                                               <!--type="text" placeholder="First Name"-->
+                                               <!--ng-model="firstname"  alpha-with-space-->
+                                               <!--class="form-control input-md" required>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for=""> Last Name </label>-->
+                                    <!--<div class="col-md-6" style="position:relative;">-->
+                                        <!--<input id="lastName" name="lastName"  maxlength="150"-->
+                                               <!--type="text" placeholder="Last Name" ng-required="false"-->
+                                               <!--ng-model="lastname"  alpha-with-space-->
+                                               <!--class="form-control input-md" required>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for=""> Email </label>-->
+                                    <!--<div class="col-md-6" style="position:relative;">-->
+                                        <!--<input id="companyEmail" name="companyEmail"  maxlength="45"-->
+                                               <!--ng-pattern="word"-->
+                                               <!--type="text" placeholder=" Email"-->
+                                               <!--ng-model="email"  -->
+                                               <!--class="form-control input-md" required>-->
+                                        <!--<p class="error" ng-show="school.emailId.$error.pattern">Enter Valid EmailId</p>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for="">Phone Number-->
+                                    <!--</label>-->
+                                    <!--<div class="col-md-6">-->
+                                        <!--<strong>-->
+                                            <!--<input id="phoneNumber" name="phoneNumber"-->
+                                                   <!--limit-to="16" ng-required="false"-->
+                                                   <!--type="text" num-with-out-space-->
+                                                   <!--ng-model="phoneNumber"-->
+                                                   <!--class="form-control input-md" required>-->
+                                        <!--</strong>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for="">Mobile Number-->
+                                    <!--</label>-->
+                                    <!--<div class="col-md-6">-->
+                                        <!--<strong>-->
+                                            <!--<input id="mobileNumber" name="mobileNumber"-->
+                                                   <!--limit-to="16"-->
+                                                   <!--type="text" num-with-out-space-->
+                                                   <!--ng-model="mobileNumber"-->
+                                                   <!--class="form-control input-md" >-->
+                                        <!--</strong>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+
+
+
+
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for="">Country </label>-->
+                                    <!--<div class="col-md-6 col-sm-6" style="position:relative;">-->
+                                        <!--<select id="countryId" name="countryId"-->
+                                                <!--ng-model="country" ng-change="countryState(country)"-->
+                                                <!--ng-options="country.countryName as country.countryName for country in countryList"-->
+                                                <!--class="form-control input-md">-->
+                                            <!--<option value="">Select</option>-->
+                                        <!--</select>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for="">State </label>-->
+                                    <!--<div class="col-md-6 col-sm-6" style="position:relative;">-->
+                                        <!--<select id="stateId" name="stateId" ng-model="stateName" ng-change="stateCity(stateName)"-->
+                                                <!--ng-options="state.stateName as-->
+											<!--state.stateName for state in stateList" class="form-control input-md">-->
+                                            <!--<option value="">Select</option>-->
+                                        <!--</select>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for="">City </label>-->
+                                    <!--<div class="col-md-6 col-sm-6" style="position:relative;">-->
+                                        <!--<select id="cityId" name="cityId" ng-model="city"-->
+                                                <!--ng-options="city.cityName as-->
+											<!--city.cityName for city in cityList" class="form-control input-md">-->
+                                            <!--<option value="">Select</option>-->
+                                        <!--</select>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for=""> Zip Code</label>-->
+                                    <!--<div class="col-md-6" style="position:relative;">-->
+                                        <!--<input id="pinCode" name="pinCode" limit-to="6"-->
+                                               <!--type="text" number ng-required="false"-->
+                                               <!--ng-model="zipCode" num-with-out-space-->
+                                               <!--class="form-control input-md" required>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+
+                            <!--</div>-->
+                            <!--<div class="col-md-6">-->
+
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for=""> User Name<span style="color:red;">*</span></label>-->
+                                    <!--<div class="col-md-6" style="position:relative;">-->
+                                        <!--<input id="userName" name="userName"  maxlength="32"-->
+                                               <!--type="text" placeholder="User Name"-->
+                                               <!--ng-model="username" alphanum-with-space-->
+                                               <!--class="form-control input-md" required>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for=""> Password<span style="color:red;">*</span></label>-->
+                                    <!--<div class="col-md-6" style="position:relative;">-->
+                                        <!--<input id="password" name="password"  maxlength="32"-->
+                                               <!--type="text" placeholder="Password"-->
+                                               <!--ng-model="password"-->
+                                               <!--class="form-control input-md" required>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for=""> Retype Password<span style="color:red;">*</span></label>-->
+                                    <!--<div class="col-md-6" style="position:relative;">-->
+                                        <!--<input id="retypePassword" name="retypePassword"  maxlength="32"-->
+                                               <!--type="text" placeholder="Retype Password"-->
+                                               <!--ng-model="retypepassword"-->
+                                               <!--class="form-control input-md" required>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                                <!--&lt;!&ndash;<div class="form-group">&ndash;&gt;-->
+                                    <!--&lt;!&ndash;<label class="col-md-4 control-label" for="">Calender</label>&ndash;&gt;-->
+                                    <!--&lt;!&ndash;<div class="col-md-6" style="position:relative;">&ndash;&gt;-->
+                                        <!--&lt;!&ndash;<select class="form-control input-md"&ndash;&gt;-->
+                                                <!--&lt;!&ndash;ng-model="calenderType" id="Calender">&ndash;&gt;-->
+                                            <!--&lt;!&ndash;<option value="">Select Type</option>&ndash;&gt;-->
+                                            <!--&lt;!&ndash;<option value="Default">Default</option>&ndash;&gt;-->
+                                            <!--&lt;!&ndash;<option value="Table">Table</option>&ndash;&gt;-->
+                                        <!--&lt;!&ndash;</select>&ndash;&gt;-->
+
+                                    <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                                <!--&lt;!&ndash;</div>&ndash;&gt;-->
+
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for="">-->
+                                        <!--Address</label>-->
+                                    <!--<div class="col-md-6">-->
+                                        <!--<strong>-->
+                                                                        <!--<textarea id="address"-->
+                                                                                  <!--name="address" ng-required="false"-->
+                                                                                  <!--maxlength="150"-->
+                                                                                  <!--type="text"-->
+                                                                                  <!--ng-model="address"-->
+                                                                                  <!--class="form-control input-md"-->
+                                                                                  <!--required>-->
+                                                            <!--</textarea>-->
+                                        <!--</strong>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                                <!--<div class="form-group">-->
+                                    <!--<label class="col-md-4 control-label" for="">-->
+                                        <!--Notes</label>-->
+                                    <!--<div class="col-md-6">-->
+                                        <!--<strong>-->
+                                                                        <!--<textarea id="notes"-->
+                                                                                  <!--name="notes" ng-required="false"-->
+                                                                                  <!--maxlength="150"-->
+                                                                                  <!--type="text"-->
+                                                                                  <!--ng-model="notes"-->
+                                                                                  <!--class="form-control input-md"-->
+                                                                                  <!--required>-->
+                                                            <!--</textarea>-->
+                                        <!--</strong>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                                <!--<br><br>-->
+                                <!--<button type="submit" class="btn btn-primary hi_btn" data-toggle="modal"-->
+                                        <!--data-target=".print-me" ng-click="saveCurrentUserDetails()">Save-->
+                                <!--</button>-->
+
+                                <!--&lt;!&ndash;<button type="submit" class="btn btn-primary hi_btn" data-toggle="modal"&ndash;&gt;-->
+                                <!--&lt;!&ndash;data-target=".print-me" ng-click="feeconfigurationList()">Back&ndash;&gt;-->
+                                <!--&lt;!&ndash;</button>&ndash;&gt;-->
+
+                            <!--</div>-->
+
+                        <!--</div>-->
+                    <!--</fieldset>-->
+
+                <!--</form>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+
+<!--</div>-->
+
+<!--</html>-->

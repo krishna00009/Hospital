@@ -1,0 +1,1451 @@
+<script src="/js/controller/comboTreePlugin.js"></script>
+<script src="/js/controller/icontains.js"></script>
+<style>
+    .modal-content{
+        width:696px;
+    }
+
+    .modal-footer {
+        padding: 5px;
+        text-align: right;
+        border-top: 1px solid #e5e5e5;
+    }
+    .modal-header {
+        padding: 5px;
+        border-bottom: 1px solid #e5e5e5;
+    }
+    fieldset {
+        min-width: 0;
+        padding: 10px;
+        margin: 0;
+        border: 0;
+    }
+    .control-label {
+        position: relative;
+        min-height: 1px;
+        padding-right: 8px;
+        padding-left: 11px;
+    }
+    .comboTreeWrapper{
+        position: relative;
+        text-align: left !important;
+    }
+
+    .comboTreeInputWrapper{
+        position: relative;
+    }
+
+    .comboTreeArrowBtn {
+        position: absolute;
+        right: 1px;
+        bottom: 1px;
+        top: 1px;
+        box-sizing: border-box;
+        border: none;
+        border-left: 1px solid #c7c7c7;
+        border-radius: 0 3px 3px 0;
+    }
+
+    .comboTreeDropDownContainer {
+        display: none;
+        background: #fff;
+        border: 1px solid #aaa;
+        max-height: 250px;
+        overflow-y: auto;
+        position: absolute;
+        width: 100%;
+        box-sizing: border-box;
+        z-index: 999;
+    }
+
+    .comboTreeDropDownContainer ul{
+        padding: 0px;
+        margin: 0;
+    }
+
+    .comboTreeDropDownContainer li{
+        list-style-type: none;
+        padding-left: 15px;
+        cursor: pointer;
+    }
+
+    .comboTreeDropDownContainer li:hover{
+        background-color: #ddd;}
+    .comboTreeDropDownContainer li:hover ul{
+        background-color: #fff;}
+    .comboTreeDropDownContainer li span.comboTreeItemTitle.comboTreeItemHover{
+        background-color: #418EFF;
+        color: #fff;}
+
+    span.comboTreeItemTitle{
+        display: block;
+        padding: 2px 4px;
+    }
+    .comboTreeDropDownContainer label{
+        cursor: pointer;
+        width: 100%;
+        display: block;
+    }
+    .comboTreeDropDownContainer .comboTreeItemTitle input {
+        position: relative;
+        top: 2px;
+        margin: 0px 4px 0px 0px;
+    }
+    .comboTreeParentPlus{
+        position: relative;
+        left: -12px;
+        top: 4px;
+        width: 4px;
+        float: left;
+    }
+
+
+    .comboTreeInputBox {
+        padding: 5px;
+        border-radius: 3px;
+        border: 1px solid #999;
+        width: 100%;
+        box-sizing: border-box;
+        padding-right: 24px;
+    }
+
+    .comboTreeArrowBtnImg{
+        font-size: 10px;
+    }
+    .form-control {
+        display: block;
+        width: 264px;
+        height: 34px;
+        padding: 6px 12px;
+        font-size: 14px;
+        line-height: 1.42857143;
+        color: #555;
+        background-color: #fff;
+        background-image: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+        box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+        -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+        -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    }
+    #jquery-script-menu {
+        position: fixed;
+        height: 90px;
+        width: 100%;
+        top: 0;
+        left: 0;
+        border-top: 5px solid #316594;
+        background: #fff;
+        -moz-box-shadow: 0 2px 3px 0px rgba(0, 0, 0, 0.16);
+        -webkit-box-shadow: 0 2px 3px 0px rgba(0, 0, 0, 0.16);
+        box-shadow: 0 2px 3px 0px rgba(0, 0, 0, 0.16);
+        z-index: 999999;
+        padding: 10px 0;
+        -webkit-box-sizing:content-box;
+        -moz-box-sizing:content-box;
+        box-sizing:content-box;
+    }
+
+    .jquery-script-center {
+        width: 960px;
+        margin: 0 auto;
+    }
+    .jquery-script-center ul {
+        width: 212px;
+        float:left;
+        line-height:45px;
+        margin:0;
+        padding:0;
+        list-style:none;
+    }
+    .jquery-script-center a {
+        text-decoration:none;
+    }
+    .jquery-script-ads {
+        width: 728px;
+        height:90px;
+        float:right;
+    }
+    .jquery-script-clear {
+        clear:both;
+        height:0;
+    }
+
+</style>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+<div class="container-fluid">
+    <div class="container cus_main_row" >
+
+        <div class="row">
+            <h2 class="pos-header-new">
+                <div>Patients</div>
+            </h2>
+        </div>
+        <div class="row inner_row_bg">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+
+                <div class="panel">
+                    <div class="panel-body">
+                        <div class="panel-body" style="height: 65px;">
+                            <div class="col-md-4 col-lg-3 col-sm-5 col-xs-5">
+                                <form class="form-horizontal ng-pristine ng-valid">
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <p class="input-group" style="display: block;">
+                                                <input id="search_grade" name="textinput"  type="text" autocomplete="off"
+                                                       placeholder="search" ng-model="searchText" class="form-control input-md"
+                                                />
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="col-md-9 col-lg-7 col-sm-9 col-xs-7">
+
+                                <!--<div class="form-group">-->
+                                    <!--<div class="col-sm-2">-->
+                                        <!--<button type="button" class="btn btn-primary hi_btn"  ng-click="addCustomers()">Add</button>-->
+
+                                    <!--</div>-->
+                                <!--</div>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="fixed-table-container">
+                    <div class="table_wrapfixed-table-container-inner">
+                        <div class="header-background"></div>
+                        <table data-toggle="table" data-cache="false" data-height="299" class="hi_table table table-hover table-bordered table-striped table-fixed-header">
+                            <thead>
+                            <tr>
+                                <th data-field="cntryname">
+                                    <div class="th-inner" align="center">Uhid</div>
+                                </th>
+                                <th data-field="cntryname">
+                                    <div class="th-inner" align="center"> Patient Name</div>
+                                </th>
+                                <!--<th data-field="edit">-->
+                                    <!--<div class="th-inner" align="center"> Last Name</div>-->
+                                <!--</th>-->
+                                <th data-field="edit">
+                                    <div class="th-inner" align="center">Email</div>
+                                </th>
+                                <th data-field="edit">
+                                    <div class="th-inner" align="center">Mobile Number</div>
+                                </th>
+                                <!--<th data-field="edit">-->
+                                    <!--<div class="th-inner" align="center">Address</div>-->
+                                <!--</th>-->
+                                <!--<th data-field="edit">-->
+                                    <!--<div class="th-inner" align="center">zipCode</div>-->
+                                <!--</th>-->
+                                <!--<th data-field="edit">-->
+                                    <!--<div class="th-inner" align="center">Notes</div>-->
+                                <!--</th>-->
+                                <!--<th data-field="edit">-->
+                                    <!--<div class="th-inner" align="center">Country</div>-->
+                                <!--</th>-->
+                                <!--<th data-field="edit">-->
+                                    <!--<div class="th-inner" align="center">state</div>-->
+                                <!--</th>-->
+                                <!--<th data-field="edit">-->
+                                    <!--<div class="th-inner" align="center">city</div>-->
+                                <!--</th>-->
+                                <th data-field="edit">
+                                    <div class="th-inner" align="center">Edit</div>
+                                </th>
+                                <!--<th data-field="edit">-->
+                                    <!--<div class="th-inner" align="center">delete</div>-->
+                                <!--</th>-->
+                            </tr>
+                            </thead>
+                            <tbody id="parentTable">
+                            <input type="hidden" ng-model="id" value="{{id}}"/>
+                            <tr ng-repeat="customer in customersList|filter:searchText|orderBy:'-uhid'" >
+                                <td>{{customer.uhid}}</td>
+                                <td ng-if="customer.lastName">{{customer.firstName+customer.lastName}}</td>
+                                <td ng-if="customer.lastName==null||customer.lastName==''">{{customer.firstName}}</td>
+                                <!--<td>{{customer.lastName}}</td>-->
+                                <td>{{customer.email}}</td>
+                                <td>{{customer.phoneNumber}}</td>
+                                <!--<td>{{customer.address}}</td>-->
+                                <!--<td>{{customer.zipCode}}</td>-->
+                                <!--<td>{{customer.notes}}</td>-->
+                                <!--<td>{{customer.countryName}}</td>-->
+                                <!--<td>{{customer.stateName}}</td>-->
+                                <!--<td>{{customer.city}}</td>-->
+                                <td><button type="button" class="btn btn-primary hi_btn"  ng-click="EditCustomers(customer)">Edit</button></td>
+                                <!--<td><button type="button" class="btn btn-primary hi_btn"  ng-click="DeleteCustomers(customer)">Delete</button></td>-->
+                            </tr>
+                            </tbody>
+                        </table>
+                        <div ng-if="searchText!='' && (customersList|filter:searchText).length==0">
+                            <div id="notFoundDiv" style="color:red; font-weight: bold">No Records Found</div>
+                        </div>
+                    </div>
+            </div>
+            <div class="modal fade Student" tabindex="-1" id="add_customers" role="dialog" data-backdrop="static"
+                 aria-labelledby="mySmallModalLabel">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content checkout" width="696px">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 id = "customers-title" class="modal-title">Add Customers</h4>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12">
+                                    <form class="form-horizontal" name="student">
+                                        <fieldset>
+                                            <div class="tab-content">
+                                                <div class="tab-pane fade in active" id="sub_step12">
+                                                    <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="col-md-6 control-label" for="">UHID No</label>
+                                                        <div class="col-md-6" style="position:relative;">
+                                                            <input id="uhid" name="uhid" maxlength="30"
+                                                                   type="text" placeholder="No."
+                                                                   ng-model="uhid" alphanum-with-space
+                                                                   class="form-control input-md" ng-readonly=true>
+                                                        </div>
+                                                    </div>
+                                                        <div class="form-group">
+                                                            <label class="col-md-6 control-label" for="">First Name<span style="color:red;">*</span></label>
+                                                            <div class="col-md-6" style="position:relative;">
+                                                                <input id="firstname" name="name"  maxlength="32"
+                                                                       type="text" placeholder="Enter Name"
+                                                                       ng-model="firstname"  alpha-with-space
+                                                                       class="form-control input-md" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-md-6 control-label" for="">Last Name</label>
+                                                            <div class="col-md-6" style="position:relative;">
+                                                                <input id="lastname" name="name"  maxlength="32"
+                                                                       type="text" placeholder="Last Name"
+                                                                       ng-model="lastname"  alpha-with-space
+                                                                       class="form-control input-md" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-md-6 control-label" for="">Gender</label>
+                                                            <div class="col-md-6" style="position:relative;">
+                                                                <select class="form-control input-md"
+                                                                        ng-model="gender" id="gender">
+                                                                    <!--ng-options="servies.id as servies.name for servies in servicesList">-->
+                                                                    <option value="">Select</option>
+                                                                    <option value="male">male</option>
+                                                                    <option value="female">female</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-md-6 control-label" for="">Marital
+                                                                Status </label>
+                                                            <div class="col-md-6 col-sm-6" style="position:relative;">
+                                                                <select class="form-control input-md"
+                                                                        ng-model="maritalStatus" id="maritalstatus">
+                                                                    <!--ng-options="servies.id as servies.name for servies in servicesList">-->
+                                                                    <option value="">Select</option>
+                                                                    <option value="single">single</option>
+                                                                    <option value="married">married</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-md-6 control-label" for="">Age
+                                                                ::</label>
+                                                            <div class="col-md-6" style="position:relative;">
+                                                                <input id="age" name="age" maxlength="3"
+                                                                       type="text" placeholder="Age"
+                                                                       ng-model="age" num-with-out-space
+                                                                       class="form-control input-md">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-md-6 control-label" for=""> Email </label>
+                                                            <div class="col-md-6" style="position:relative;">
+                                                                <input id="companyEmail" name="companyEmail"  maxlength="45"
+                                                                       ng-pattern="word"
+                                                                       type="text" placeholder=" Email"
+                                                                       ng-model="email"
+                                                                       class="form-control input-md" required>
+                                                                <p class="error" ng-show="school.emailId.$error.pattern">Enter Valid EmailId</p>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-md-6 control-label" for=""> Mobile Number</label>
+                                                            <div class="col-md-6" style="position:relative;">
+                                                                <input id="phoneNumber" name="phoneNumber"  maxlength="16"
+                                                                       type="text" placeholder="Enter PhoneNumber"
+                                                                       ng-model="phoneNumber" num-with-out-space
+                                                                       class="form-control input-md" required>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group">
+                                                            <label class="col-md-6 control-label" for=""> Address</label>
+                                                            <div class="col-md-6" style="position:relative;">
+                                                                <textarea id="address" name="Address"  maxlength="150"
+                                                                       type="text" placeholder="Enter Address"
+                                                                       ng-model="Address"
+                                                                       class="form-control input-md" required>
+                                                                </textarea>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-md-6 control-label"
+                                                                   for="">occupation</label>
+                                                            <div class="col-md-6" style="position:relative;">
+                                                                <select class="form-control input-md"
+                                                                        ng-model="occupation" id="occupation">
+                                                                    <!--ng-options="servies.id as servies.name for servies in servicesList">-->
+                                                                    <option value="">Select</option>
+                                                                    <option value="self">self</option>
+                                                                    <option value="employed">employed</option>
+                                                                    <option value="others">others</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="col-md-6 control-label" for=""> ZipCode</label>
+                                                            <div class="col-md-6" style="position:relative;">
+                                                                <input id="zipCode" name="zipCode"  maxlength="150"
+                                                                       type="number" placeholder="Enter Zipcode"
+                                                                       ng-model="ZipCode" num-with-out-space
+                                                                       class="form-control input-md" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group" style="margin-top: 20px;">
+                                                            <label class="col-md-6 control-label" for="">Date</label>
+                                                            <div class="col-md-6" style="padding-left: 0px;">
+                                                                <p class="input-group">
+                                                                    <input type="text" id="AppointmentDate"
+                                                                           ng-model="date" class="form-control" readonly
+                                                                           uib-datepicker-popup="{{format}}"
+                                                                           is-open="popup1.opened"
+                                                                           datepicker-options="dateOptions"
+                                                                           close-text="Close"
+                                                                           alt-input-formats="altInputFormats"/>
+                                                                    <span class="input-group-btn">
+                                                                     <button type="button" class="btn btn-default"
+                                                                             ng-click="open1()">
+                                                                         <i class="glyphicon glyphicon-calendar"></i></button>
+                                                                     </span>
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                        <!--<div class="col-md-6">-->
+                                                            <div class="form-group" style="margin-top: 20px;">
+                                                                <label class="col-md-6 control-label" for="">Country </label>
+                                                                <div class="col-md-6 col-sm-6" style="position:relative;">
+                                                                    <select id="countryId" name="countryId"
+                                                                            ng-model="countryName"
+                                                                            ng-change="countryState(countryName)"
+                                                                            ng-options="country.countryName as country.countryName for country in countryList"
+                                                                            class="form-control input-md">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label class="col-md-6 control-label" for="">State </label>
+                                                                <div class="col-md-6 col-sm-6" style="position:relative;">
+                                                                    <select id="stateId" name="stateId" ng-model="stateName"
+                                                                            ng-change="stateCity(stateName)"
+                                                                            ng-options="state.stateName as
+											state.stateName for state in stateList" class="form-control input-md">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+
+
+                                                            <div class="form-group">
+                                                                <label class="col-md-6 control-label" for="">City </label>
+                                                                <div class="col-md-6 col-sm-6" style="position:relative;">
+                                                                    <select id="cityId" name="cityId" ng-model="city"
+                                                                            ng-options="city.cityName as
+											city.cityName for city in cityList" class="form-control input-md">
+                                                                        <option value="">Select</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+
+                                                            <!--<div class="form-group">-->
+                                                            <!--<label class="col-md-6 control-label" for="">Notes</label>-->
+                                                            <!--<div class="col-md-6" style="position:relative;">-->
+                                                                <!--<textarea id="Notes" name="Notes"  maxlength="150"-->
+                                                                       <!--type="text" placeholder="write here"-->
+                                                                       <!--ng-model="Notes"-->
+                                                                       <!--class="form-control input-md" required>-->
+                                                                    <!--</textarea>-->
+                                                            <!--</div>-->
+                                                        <!--</div>-->
+
+                                                        <div class="form-group">
+                                                            <label class="col-md-4 control-label" for="">Cheif Complaints/
+                                                                Presenting Complaints
+                                                                (Vedana Vishesh):</label>
+                                                            <div class="col-md-6" style="position:relative;">
+                                                                <input type="text" id="SelectAppointmentDisease"  placeholder="Select a Disease"/>
+
+                                                            </div>
+                                                            </div>
+                                                        <div class="form-group">
+                                                            <label class="col-md-6 control-label" for="">History Of Presenting Complaints(Vartaman Vyadhi Vritanata):</label>
+                                                            <div class="col-md-6" style="position:relative;">
+                                                                <textarea id="historyofpresenting" name="historyofpresenting"
+                                                                          maxlength="150"
+                                                                          type="notes" placeholder="History Of Presenting Complaints"
+                                                                          ng-model="historyofpresenting"
+                                                                          class="form-control input-md"
+                                                                          required></textarea>
+                                                            </div>
+                                                        </div>
+                                                        <!--<div class="form-group">-->
+                                                                <!--<label class="col-md-6 control-label" for="">Time<span style="color:red;">*</span></label>-->
+                                                                <!--<div class="col-md-6" style="padding-left: 0px;">-->
+                                                                    <!--<input name="start"  maxlength="7" readonly-->
+                                                                           <!--type="text" placeholder="Ex:5:30pm"-->
+                                                                           <!--ng-model="time" alphanum-without-space-->
+                                                                           <!--class="form-control input-md" required>-->
+                                                                <!--</div>-->
+                                                        <!--</div>-->
+                                                        <!--</div>-->
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                        </fieldset>
+
+                                    </form>
+                                            </div>
+
+                                </div>
+                            </div>
+                        <div class="modal-footer">
+                            <button type="button" id="submit" class="btn btn-primary" ng-click="saveCustomers()">Save</button>
+                            <button type="button" class="btn btn-primary" ng-click="removeCustomers()" data-dismiss="modal">Close</button>
+                        </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
+<script type="text/javascript">
+
+    var SampleJSONData = [
+        {
+            id: 0,
+            title: 'Select'
+        }, {
+            id: 1,
+            title: 'Ache',
+            subs: [
+                {
+                    id: 10,
+                    title: 'HeadAche'
+                }, {
+                    id: 11,
+                    title: 'Stomachache'
+                }, {
+                    id: 12,
+                    title: 'Backache'
+                },{
+                    id: 13,
+                    title: 'Bodyache'
+                }
+            ]
+        }, {
+            id: 2,
+            title: 'Allergy'
+        }, {
+            id: 3,
+            title: 'Anxiety'
+        }, {
+            id: 4,
+            title: 'Bad Breath'
+        }, {
+            id: 5,
+            title: 'Bad taste in mouth'
+        }, {
+            id: 6,
+            title: 'Bleeding gums'
+        }, {
+            id: 7,
+            title: 'Blisters'
+        }, {
+            id: 8,
+            title: 'Blood in urine'
+        }, {
+            id: 9,
+            title: 'Bleeding in semen'
+        }, {
+            id: 10,
+            title: 'Bleeding in stool'
+        }, {
+            id: 11,
+            title: 'Bloody nose'
+        }, {
+            id: 12,
+            title: 'Bloody sputum'
+        }, {
+            id: 13,
+            title: 'Bowel incontinence'
+        }, {
+            id: 14,
+            title: 'Brittle nails'
+        }, {
+            id: 15,
+            title: 'Bumps on skin'
+        }, {
+            id: 16,
+            title: 'Bloating'
+        }, {
+            id: 17,
+            title: 'Blurred vision'
+        }, {
+            id: 18,
+            title: 'Belching'
+        }, {
+            id: 19,
+            title: 'Burning',
+            subs: [
+                {
+                    id: 190,
+                    title: 'Urine-Burning'
+                }, {
+                    id: 191,
+                    title: 'Throat-Burning'
+                }, {
+                    id: 192,
+                    title: 'Chest-Burning'
+                },{
+                    id: 193,
+                    title: 'Stomach-Burning'
+                },{
+                    id: 194,
+                    title: 'Anal region-Burning'
+                },{
+                    id: 195,
+                    title: 'Eyes-Burning'
+                },{
+                    id: 196,
+                    title: 'Skin-Burning'
+                },{
+                    id: 197,
+                    title: 'Palms-Burning'
+                },{
+                    id: 198,
+                    title: 'Soles-Burning'
+                },{
+                    id: 199,
+                    title: 'Nose-Burning'
+                }
+            ]
+        },{
+            id: 20,
+            title: 'Cellulitis'
+        },{
+            id: 21,
+            title: 'Chapped lips'
+        },{
+            id: 22,
+            title: 'Chest pain'
+        },{
+            id: 23,
+            title: 'Chest tightness'
+        },{
+            id: 24,
+            title: 'Chills'
+        },{
+            id: 25,
+            title: 'Cold fingers'
+        },{
+            id: 26,
+            title: 'Cold feet'
+        },{
+            id: 27,
+            title: 'Confusion'
+        },{
+            id: 28,
+            title: 'Creaking joint'
+        }, {
+            id: 29,
+            title: 'Cramps'
+        }, {
+            id:30,
+            title: 'Cracking',
+            subs: [
+                {
+                    id: 300,
+                    title: 'Skin-Cracking'
+                }, {
+                    id: 301,
+                    title: 'Palms-Cracking'
+                }, {
+                    id: 302,
+                    title: 'Soles-Cracking'
+                }
+            ]
+        },{
+            id: 31,
+            title: 'Cold'
+        },{
+            id: 32,
+            title: 'Cough'
+        },{
+            id: 33,
+            title: 'Constipation'
+        },{
+            id: 34,
+            title: 'Depression'
+        },{
+            id: 35,
+            title: 'Delusions'
+        },{
+            id: 36,
+            title: 'Delirium'
+        },{
+            id: 37,
+            title: 'Difficulty in  concentrating'
+        },{
+            id: 38,
+            title: 'Dizziness'
+        },{
+            id: 39,
+            title: 'Diarrhea'
+        },{
+            id: 40,
+            title: 'Dryness',
+            subs: [
+                {
+                    id: 400,
+                    title: 'Mouth-Dryness'
+                }, {
+                    id: 401,
+                    title: 'Throat-Dryness'
+                }, {
+                    id: 402,
+                    title: 'Skin-Dryness'
+                },{
+                    id: 403,
+                    title: 'Eyes-Dryness'
+                },{
+                    id: 404,
+                    title: 'Lips-Dryness'
+                },{
+                    id: 405,
+                    title: 'Hair-Dryness'
+                }
+            ]
+        },{
+            id: 41,
+            title: 'Difficulty',
+            subs: [
+                {
+                    id: 410,
+                    title: 'Swallowing-Difficulty'
+                }, {
+                    id: 411,
+                    title: 'Micturition-Difficulty'
+                }, {
+                    id: 412,
+                    title: 'Passing stools-Difficulty'
+                },{
+                    id: 413,
+                    title: 'Walking-Difficulty'
+                },{
+                    id: 414,
+                    title: 'Talking-Difficulty'
+                }
+            ]
+        },{
+            id: 42,
+            title: 'Drooling'
+        },{
+            id: 43,
+            title: 'Dysarthria'
+        },{
+            id: 44,
+            title: 'Dyspepsia'
+        },{
+            id: 45,
+            title: 'Dysphagia'
+        },{
+            id: 46,
+            title: 'Elbow pain'
+        },{
+            id: 47,
+            title: 'Excessive sweating'
+        },{
+            id: 48,
+            title: 'Eye twitch'
+        },{
+            id: 49,
+            title: 'Eye discharge'
+        },{
+            id: 50,
+            title: 'Flatulence'
+        },{
+            id: 51,
+            title: 'Flu'
+        },{
+            id: 52,
+            title: 'Fatigue'
+        },{
+            id: 53,
+            title: 'Fracture'
+        },{
+            id: 54,
+            title: 'Faint'
+        },{
+            id: 55,
+            title: 'Fecal incontinence'
+        },{
+            id: 56,
+            title: 'Fluctuating mood'
+        },{
+            id: 57,
+            title: 'Foot pain'
+        },{
+            id: 58,
+            title: 'Finger pain'
+        },{
+            id:59,
+            title: 'Flaky scalp'
+        },{
+            id: 60,
+            title: 'Gurgling'
+        },{
+            id: 61,
+            title: 'Gastric problem'
+        },{
+            id: 62,
+            title: 'Generalized anxiety'
+        },{
+            id: 63,
+            title: 'Genital warts'
+        },{
+            id: 64,
+            title: 'Gum pain'
+        },{
+            id: 65,
+            title: 'Groin pain'
+        },{
+            id: 66,
+            title: 'Hair loss'
+        },{
+            id: 67,
+            title: 'Hairy tongue'
+        },{
+            id: 68,
+            title: 'Hallucination'
+        },{
+            id: 69,
+            title: 'Headache'
+        },{
+            id: 70,
+            title: 'Hand pain'
+        },{
+            id: 71,
+            title: 'Hearing loss'
+        },{
+            id: 72,
+            title: 'Heart burn'
+        },{
+            id: 73,
+            title: 'Heel pain'
+        },{
+            id: 74,
+            title: 'Hiccups'
+        },{
+            id: 75,
+            title: 'High blood pressure'
+        },{
+            id: 76,
+            title: 'Hip pain'
+        },{
+            id: 77,
+            title: 'Hoarseness'
+        },{
+            id: 78,
+            title: 'Hot flashes'
+        },{
+            id: 79,
+            title: 'Hyperactivity'
+        },{
+            id: 80,
+            title: 'Hyperthyroidism'
+        },{
+            id: 81,
+            title: 'Hypothyroidism'
+        },{
+            id: 82,
+            title: 'Hyper ventilation'
+        },{
+            id: 83,
+            title: 'Impotence'
+        },{
+            id: 84,
+            title: 'Impulsivity'
+        },{
+            id: 85,
+            title: 'Inability to regulate motion'
+        },{
+            id: 86,
+            title: 'Inattention'
+        },{
+            id: 87,
+            title: 'Incontinence urine'
+        },{
+            id: 88,
+            title: 'Infertility'
+        },{
+            id: 89,
+            title: 'Irritable bowel syndrome'
+        },{
+            id: 90,
+            title: 'Insomnia'
+        },{
+            id: 91,
+            title: 'Itch'
+        },{
+            id: 92,
+            title: 'Joint pain'
+        },{
+            id: 93,
+            title: 'Joint cracking'
+        },{
+            id: 94,
+            title: 'Jaw pain'
+        },{
+            id: 95,
+            title: 'Joint deformity'
+        },{
+            id: 96,
+            title: 'Joint redness'
+        },{
+            id: 97,
+            title: 'Joint stiffness'
+        },{
+            id: 98,
+            title: 'Joint warmth'
+        },{
+            id: 99,
+            title: 'Kidney stone'
+        },{
+            id: 100,
+            title: 'Kidney infection'
+        },{
+            id: 101,
+            title: 'Knee pain'
+        },{
+            id: 102,
+            title: 'Knee swelling'
+        },{
+            id: 103,
+            title: 'Labile mood'
+        },{
+            id: 104,
+            title: 'Lack of facial expressions'
+        },{
+            id: 105,
+            title: 'Lactase deficiency'
+        },{
+            id: 106,
+            title: 'Lactase intolerance'
+        },{
+            id: 107,
+            title: 'Leg pain'
+        },{
+            id: 108,
+            title: 'Leg sores'
+        },{
+            id: 109,
+            title: 'Leg swelling'
+        },{
+            id: 110,
+            title: 'Limping'
+        },{
+            id: 111,
+            title: 'Loss of appetite'
+        },{
+            id: 112,
+            title: 'Loss of speech'
+        },{
+            id: 113,
+            title: 'Loss of taste sensation'
+        },{
+            id: 114,
+            title: 'Loss of temperature sensation'
+        },{
+            id: 115,
+            title: 'Low blood pressure'
+        },{
+            id: 116,
+            title: 'Low blood sugar'
+        },{
+            id: 117,
+            title: 'Low urine out put'
+        },{
+            id: 118,
+            title: 'Lumps'
+        },{
+            id: 119,
+            title: 'Low libido'
+        },{
+            id: 120,
+            title: 'Memory loss'
+        },{
+            id: 121,
+            title: 'Menopause symptoms'
+        },{
+            id: 122,
+            title: 'Menstrual symptoms'
+        },{
+            id: 123,
+            title: 'Metallic taste in the tongue'
+        },{
+            id: 124,
+            title: 'Middle ear infection'
+        },{
+            id: 125,
+            title: 'Migraine'
+        },{
+            id: 126,
+            title: 'Miscarriage'
+        },{
+            id: 127,
+            title: 'Mood swings'
+        },{
+            id: 128,
+            title: 'Morning sickness'
+        },{
+            id: 129,
+            title: 'Motor tics'
+        },{
+            id: 130,
+            title: 'Mouth sores'
+        },{
+            id: 131,
+            title: 'Muscle cramp'
+        },{
+            id: 132,
+            title: 'Muscle pain'
+        },{
+            id: 133,
+            title: 'Muscle spasticity'
+        },{
+            id: 134,
+            title: 'Missed menstrual period'
+        },{
+            id: 135,
+            title: 'Nail clubbing'
+        },{
+            id: 136,
+            title: 'Nail discoloration'
+        },{
+            id: 137,
+            title: 'Nail pitting'
+        },{
+            id: 138,
+            title: 'Nail fungus'
+        },{
+            id: 139,
+            title: 'Nail separation'
+        },{
+            id: 140,
+            title: 'Nail congestion'
+        },{
+            id: 141,
+            title: 'Nausea'
+        },{
+            id: 142,
+            title: 'Neck pain'
+        },{
+            id: 143,
+            title: 'Neglecting one self'
+        },{
+            id: 144,
+            title: 'Nipple pain'
+        },{
+            id: 145,
+            title: 'Numbness',
+            subs: [
+                {
+                    id: 1450,
+                    title: 'Finger-Numbness'
+                }, {
+                    id: 1451,
+                    title: 'Toe-Numbness'
+                }, {
+                    id: 1452,
+                    title: 'Tongue-Numbness'
+                },{
+                    id: 1453,
+                    title: 'Ears-Numbness'
+                },{
+                    id: 1454,
+                    title: 'Skin-Numbness'
+                }
+            ]
+        },{
+            id: 146,
+            title: 'Ovarian cancer'
+        },{
+            id: 147,
+            title: 'Osteopenia'
+        },{
+            id: 148,
+            title: 'Osteoporosis'
+        },{
+            id: 149,
+            title: 'Over active bladder'
+        },{
+            id: 150,
+            title: 'Pain in penis'
+        },{
+            id: 151,
+            title: 'Painful gums'
+        },{
+            id: 152,
+            title: 'Painful intercourse'
+        },{
+            id: 153,
+            title: 'Pale skin'
+        },{
+            id: 154,
+            title: 'Palpitation'
+        },{
+            id: 155,
+            title: 'Panic attack'
+        },{
+            id: 156,
+            title: 'Paralysis'
+        },{
+            id: 157,
+            title: 'Peeling skin'
+        },{
+            id: 158,
+            title: 'Pelvic pain'
+        },{
+            id: 159,
+            title: 'Penile discharge'
+        },{
+            id: 160,
+            title: 'Penile itching'
+        },{
+            id: 161,
+            title: 'Photo phobia'
+        },{
+            id: 162,
+            title: 'Pink eye'
+        },{
+            id: 163,
+            title: 'Nail pitting'
+        },{
+            id: 164,
+            title: 'Poor nutrition'
+        },{
+            id: 165,
+            title: 'Psoriasis'
+        },{
+            id: 166,
+            title: 'Proteinuria'
+        },{
+            id: 167,
+            title: 'Rectal bleeding'
+        },{
+            id: 168,
+            title: 'Rectal incontinence'
+        },{
+            id: 169,
+            title: 'Rectal pain'
+        },{
+            id: 170,
+            title: 'Red gums'
+        },{
+            id: 171,
+            title: 'Red streaks on the skin'
+        },{
+            id: 172,
+            title: 'Red spot on the skin'
+        },{
+            id: 173,
+            title: 'Restlessness'
+        },{
+            id: 174,
+            title: 'Restless leg syndrome'
+        },{
+            id: 175,
+            title: 'Ringing in ear'
+        },{
+            id: 176,
+            title: 'Running nose'
+        },{
+            id: 177,
+            title: 'Seizures'
+        },{
+            id: 178,
+            title: 'Self-neglect'
+        },{
+            id: 179,
+            title: 'Shaking hands'
+        },{
+            id: 180,
+            title: 'Seizures'
+        },{
+            id: 181,
+            title: 'Shortness of breath'
+        },{
+            id: 182,
+            title: 'Shoulder pain'
+        },{
+            id: 183,
+            title: 'Sneezing'
+        },{
+            id: 184,
+            title: 'Snoring'
+        },{
+            id: 185,
+            title: 'Seizures'
+        },{
+            id: 186,
+            title: 'Sore throat'
+        },{
+            id: 187,
+            title: 'Sore tongue'
+        },{
+            id: 188,
+            title: 'Spasticity'
+        },{
+            id: 189,
+            title: 'Spoon shaped finger nails'
+        },{
+            id: 190,
+            title: 'Stiff neck'
+        },{
+            id: 191,
+            title: 'Stomach cramps'
+        },{
+            id: 192,
+            title: 'Stomach ache'
+        },{
+            id: 193,
+            title: 'Stomach ulcer'
+        },{
+            id: 194,
+            title: 'Stools color and texture changes'
+        },{
+            id: 195,
+            title: 'Swollen',
+            subs: [
+                {
+                    id: 1950,
+                    title: 'Breast-Swollen'
+                }, {
+                    id: 1951,
+                    title: 'Gums-Swollen',
+                }, {
+                    id: 1952,
+                    title: 'Eyes-Swollen',
+                }, {
+                    id: 1953,
+                    title: 'Joints-Swollen',
+                }, {
+                    id: 1954,
+                    title: 'Knee-Swollen',
+                }, {
+                    id: 1955,
+                    title: 'Lips-Swollen',
+                }, {
+                    id: 1956,
+                    title: 'Lymph nodes-Swollen',
+                }, {
+                    id: 1957,
+                    title: 'Tongue-Swollen',
+                }, {
+                    id: 1958,
+                    title: 'Testicles-Swollen',
+                }, {
+                    id: 1959,
+                    title: 'Tonsils-Swollen',
+                }
+            ]
+        },{
+            id: 196,
+            title: 'Testicular pain'
+        },{
+            id: 197,
+            title: ' Testicular swelling'
+        },{
+            id: 198,
+            title: ' Thirst'
+        },{
+            id: 199,
+            title: ' Throat pain'
+        },{
+            id: 200,
+            title: ' Tightness in chest'
+        },{
+            id: 201,
+            title: ' Tingling in hands and feet'
+        },{
+            id: 202,
+            title: ' Toe pain '
+        },{
+            id: 203,
+            title: ' Toothache'
+        },{
+            id: 204,
+            title: ' Trauma'
+        },{
+            id: 205,
+            title: ' Tremor'
+        },{
+            id: 206,
+            title: ' Unsteady gait'
+        },{
+            id: 207,
+            title: ' Unusual behavior'
+        },{
+            id: 208,
+            title: ' Urge incontinence'
+        },{
+            id: 209,
+            title: ' Urinary retention'
+        },{
+            id: 210,
+            title: ' UTI (urinary tract infection)'
+        },{
+            id: 211,
+            title: ' Urine odor'
+        },{
+            id: 212,
+            title: ' Urine urgency'
+        },{
+            id: 213,
+            title: ' Vaginal',
+            subs: [
+                {
+                    id: 2130,
+                    title: 'Bleeding-Vaginal'
+                }, {
+                    id: 2131,
+                    title: 'Discharge-Vaginal'
+                },{
+                    id: 2132,
+                    title: 'Dryness-Vaginal'
+                },{
+                    id: 2133,
+                    title: 'Itching-Vaginal'
+                },{
+                    id: 2134,
+                    title: 'Odor-Vaginal'
+                },{
+                    id: 2135,
+                    title: 'Pain-Vaginal'
+                },{
+                    id: 2136,
+                    title: 'Yeast infection-Vaginal'
+                }
+            ]
+        }, {
+            id: 214,
+            title: 'Vertical ridges in the fingers'
+        }, {
+            id: 215,
+            title: 'Vertigo'
+        }, {
+            id: 216,
+            title: 'Vision loss'
+        }, {
+            id: 217,
+            title: 'Vocal out burst'
+        }, {
+            id: 218,
+            title:' Vocal tics'
+        }, {
+            id: 219,
+            title: 'Vomiting',
+            subs: [
+                {
+                    id: 2190,
+                    title: 'Vomiting of Blood '
+                }, {
+                    id: 2191,
+                    title: 'Vomiting of Sputum'
+                }, {
+                    id: 2192,
+                    title: 'Vomiting of Water'
+                }, {
+                    id: 2193,
+                    title: 'Vomiting of Food particles'
+                }, {
+                    id: 2194,
+                    title: 'Vomiting of Gastric secretions'
+                }
+            ]
+        }, {
+            id: 220,
+            title: ' Watery eyes'
+        }, {
+            id: 221,
+            title: 'Weakness'
+        }, {
+            id: 222,
+            title: 'Weight gain'
+        }, {
+            id: 223,
+            title: 'Weight loss'
+        }, {
+            id: 224,
+            title: 'Wheezing'
+        }, {
+            id: 225,
+            title: ' White tongue'
+        }, {
+            id: 226,
+            title: 'Wrist pain'
+        }
+    ];
+    var comboTree1, comboTree2;
+
+    jQuery(document).ready(function($) {
+
+        comboTree1 = $('#justAnInputBox').comboTree({
+            source : SampleJSONData,
+            isMultiple: true
+        });
+
+        comboTree2 = $('#SelectAppointmentDisease').comboTree({
+            source : SampleJSONData,
+            isMultiple: false
+        });
+
+
+
+
+    });
+
+
+</script>
